@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
   Plus,
@@ -24,6 +24,7 @@ interface SidebarProps {
 export function Sidebar({ onOpenSettings }: SidebarProps) {
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   const fetchNotebooks = async () => {
@@ -56,7 +57,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
       if (res.ok) {
         fetchNotebooks();
         const nb = await res.json();
-        window.location.href = `/notebook/${nb.id}`;
+        router.push(`/notebook/${nb.id}`);
       }
     } catch (err) {
       console.error("Failed to create notebook:", err);
@@ -72,7 +73,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
       await fetch(`/api/notebooks/${id}`, { method: "DELETE" });
       fetchNotebooks();
       if (pathname === `/notebook/${id}`) {
-        window.location.href = "/";
+        router.push("/");
       }
     } catch (err) {
       console.error("Failed to delete notebook:", err);

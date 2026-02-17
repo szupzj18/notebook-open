@@ -40,7 +40,8 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   };
 
   useEffect(() => {
-    fetchNotebooks();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- notebooks are loaded asynchronously when route changes.
+    void fetchNotebooks();
   }, [pathname]);
 
   const createNotebook = async () => {

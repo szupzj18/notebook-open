@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
   Plus,
@@ -24,6 +24,7 @@ interface SidebarProps {
 export function Sidebar({ onOpenSettings }: SidebarProps) {
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   const fetchNotebooks = async () => {
@@ -39,7 +40,8 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   };
 
   useEffect(() => {
-    fetchNotebooks();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- notebooks are loaded asynchronously when route changes.
+    void fetchNotebooks();
   }, [pathname]);
 
   const createNotebook = async () => {
@@ -54,9 +56,9 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
       });
 
       if (res.ok) {
-        fetchNotebooks();
         const nb = await res.json();
-        window.location.href = `/notebook/${nb.id}`;
+        fetchNotebooks();
+        router.push(`/notebook/${nb.id}`);
       }
     } catch (err) {
       console.error("Failed to create notebook:", err);
@@ -69,10 +71,15 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
     if (!confirm("Delete this notebook and all its contents?")) return;
 
     try {
-      await fetch(`/api/notebooks/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/notebooks/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        console.error("Failed to delete notebook:", res.status, res.statusText);
+        return;
+      }
+
       fetchNotebooks();
       if (pathname === `/notebook/${id}`) {
-        window.location.href = "/";
+        router.push("/");
       }
     } catch (err) {
       console.error("Failed to delete notebook:", err);

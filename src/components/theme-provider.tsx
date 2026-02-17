@@ -26,8 +26,12 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored) setTheme(stored);
+    const stored = localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark" || stored === "system") {
+      Promise.resolve().then(() => {
+        setTheme(stored);
+      });
+    }
   }, []);
 
   useEffect(() => {

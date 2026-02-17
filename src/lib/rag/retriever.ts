@@ -1,5 +1,5 @@
 import { db, schema } from "@/lib/db";
-import { eq, inArray } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { generateEmbedding } from "./embeddings";
 import { searchVectors } from "./vector-store";
 import type { ChatSource } from "@/types";

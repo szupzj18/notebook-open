@@ -56,8 +56,8 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
       });
 
       if (res.ok) {
-        fetchNotebooks();
         const nb = await res.json();
+        fetchNotebooks();
         router.push(`/notebook/${nb.id}`);
       }
     } catch (err) {
@@ -71,7 +71,12 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
     if (!confirm("Delete this notebook and all its contents?")) return;
 
     try {
-      await fetch(`/api/notebooks/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/notebooks/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        console.error("Failed to delete notebook:", res.status, res.statusText);
+        return;
+      }
+
       fetchNotebooks();
       if (pathname === `/notebook/${id}`) {
         router.push("/");

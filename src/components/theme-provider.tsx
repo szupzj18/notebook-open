@@ -23,18 +23,16 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return defaultTheme;
-    }
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
 
+  useEffect(() => {
     const stored = localStorage.getItem("theme");
     if (stored === "light" || stored === "dark" || stored === "system") {
-      return stored;
+      Promise.resolve().then(() => {
+        setTheme(stored);
+      });
     }
-
-    return defaultTheme;
-  });
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
